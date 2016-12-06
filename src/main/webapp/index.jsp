@@ -6,6 +6,6 @@
     <title>test</title>  
   </head>  
   <body>  
-   	${user.userName}  
+   	test 
   </body>  
 </html> 
