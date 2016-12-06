@@ -18,7 +18,7 @@ public class UserService implements IUserService {
 	public User getUserById(int userId) {
 	      SqlSession sqlSession = sessionFactory.openSession(true);  
 	      UserDao userDao = sqlSession.getMapper(UserDao.class);  
-	      User user = userDao.findUserById(8);
+	      User user = userDao.findUserById(userId);
 	      return user;
 	}
 
