@@ -16,10 +16,10 @@ public class BaseController {
     @Resource  
     private IUserService userService;  
       
-    @RequestMapping("/showUser")  
+    @RequestMapping("/showUser")
     public String toIndex(HttpServletRequest request,Model model){  
         int userId = Integer.parseInt(request.getParameter("id"));  
-        User user = this.userService.getUserById(userId);  
+        User user = userService.getUserById(userId);  
         model.addAttribute("user", user);  
         return "user";  
     }
