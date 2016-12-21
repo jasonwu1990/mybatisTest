@@ -4,9 +4,6 @@ import java.io.IOException;
 
 import javax.servlet.ServletException;
 
-import org.apache.ibatis.io.Resources;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.springframework.mock.web.MockServletConfig;
 import org.springframework.mock.web.MockServletContext;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
@@ -30,7 +27,7 @@ public class DispatcherServletChannelInitializer extends ChannelInitializer<Sock
 		AnnotationConfigWebApplicationContext wac = new AnnotationConfigWebApplicationContext();
 		wac.setServletContext(servletContext);
 		wac.setServletConfig(servletConfig);
-		wac.register(AppConfig.class);
+		wac.register(AppConfig.class); 
 		wac.refresh();
 		
 		dispatcherServlet = new DispatcherServlet(wac);

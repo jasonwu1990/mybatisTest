@@ -2,6 +2,8 @@ package com.jason.user.dto;
 
 import org.apache.ibatis.type.Alias;
 
+import com.jason.framework.json.JsonDocument;
+
 //@Alias("User")
 public class User {
 	  private int id;
@@ -40,5 +42,10 @@ public class User {
 	  public void setDeleteFlag(int deleteFlag) {
 	      this.deleteFlag = deleteFlag;
 	  }
+	public void buildJson(JsonDocument doc) {
+		doc.createElement("name", name);
+		doc.createElement("age", age);
+		doc.createElement("deleteFlag", deleteFlag);
+	}
 	
 }

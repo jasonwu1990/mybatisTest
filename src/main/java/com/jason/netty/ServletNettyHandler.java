@@ -1,6 +1,5 @@
 package com.jason.netty;
 
-import static io.netty.handler.codec.http.HttpHeaders.Names.CONTENT_TYPE;
 import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
 import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
@@ -14,6 +13,7 @@ import java.util.Map.Entry;
 import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.web.util.UriComponents;
@@ -30,7 +30,6 @@ import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.stream.ChunkedStream;
@@ -48,12 +47,12 @@ public class ServletNettyHandler extends SimpleChannelInboundHandler<FullHttpReq
 	}
 
 	private MockHttpServletRequest createServletRequest(FullHttpRequest fullHttpRequest) {
-		UriComponents uriComponents = UriComponentsBuilder.fromUriString(fullHttpRequest.getUri()).build();
+		UriComponents uriComponents = UriComponentsBuilder.fromUriString(fullHttpRequest.uri()).build();
 
 		MockHttpServletRequest servletRequest = new MockHttpServletRequest(this.servletContext);
 		servletRequest.setRequestURI(uriComponents.getPath());
 		servletRequest.setPathInfo(uriComponents.getPath());
-		servletRequest.setMethod(fullHttpRequest.getMethod().name());
+		servletRequest.setMethod(fullHttpRequest.method().name());
 
 		if (uriComponents.getScheme() != null) {
 			servletRequest.setScheme(uriComponents.getScheme());
@@ -91,7 +90,6 @@ public class ServletNettyHandler extends SimpleChannelInboundHandler<FullHttpReq
                 }
             }
         } catch (UnsupportedEncodingException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -134,7 +132,7 @@ public class ServletNettyHandler extends SimpleChannelInboundHandler<FullHttpReq
 				status,
 				content
 		);
-		fullHttpResponse.headers().add(CONTENT_TYPE, "text/plain; charset=UTF-8");
+		fullHttpResponse.headers().add(HttpHeaders.CONTENT_TYPE, "text/plain; charset=UTF-8");
 
 		// Close the connection as soon as the error message is sent.
 		ctx.write(fullHttpResponse).addListener(ChannelFutureListener.CLOSE);
@@ -142,7 +140,7 @@ public class ServletNettyHandler extends SimpleChannelInboundHandler<FullHttpReq
 
 	@Override
 	protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
-		if (!fullHttpRequest.getDecoderResult().isSuccess()) {
+		if (!fullHttpRequest.decoderResult().isSuccess()) {
 			sendError(channelHandlerContext, BAD_REQUEST);
 			return;
 		}

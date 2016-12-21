@@ -8,7 +8,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 public class MyServer {
-	private final static Logger logger = LoggerFactory.getLogger(MyServer.class);
+	private final static Logger logger = LoggerFactory.getLogger("com.jason.dayreport");
 
 	private final int port;
 
@@ -18,9 +18,10 @@ public class MyServer {
 
 	public void run() throws Exception {
 		ServerBootstrap server = new ServerBootstrap();
-		NioEventLoopGroup group = new NioEventLoopGroup();
+		NioEventLoopGroup boss = new NioEventLoopGroup();
+		NioEventLoopGroup worker = new NioEventLoopGroup();
 		try {
-			server.group(new NioEventLoopGroup(), new NioEventLoopGroup())
+			server.group(boss, worker)
 					.channel(NioServerSocketChannel.class)
 					.localAddress(port)
 					.childHandler(new DispatcherServletChannelInitializer());
@@ -30,7 +31,8 @@ public class MyServer {
 			server.bind().sync().channel().closeFuture().sync();
 		}
 		finally {
-			group.shutdownGracefully();
+			boss.shutdownGracefully();
+			worker.shutdownGracefully();
 		}
 	}
 
@@ -39,7 +41,7 @@ public class MyServer {
 		if (args.length > 0) {
 			port = Integer.parseInt(args[0]);
 		} else {
-			port = 8080;
+			port = 9000;
 		}
 		new MyServer(port).run();
 	}
