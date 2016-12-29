@@ -1,5 +1,6 @@
 package com.jason.invocate;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 public class ActionInvocation {
@@ -9,7 +10,7 @@ public class ActionInvocation {
 	
 	protected String methodName;
 	
-//	protected Adaptor[] paramsAdaptors;
+	protected Adaptor[] paramsAdaptors;
 	
 	private static final String CLASS_KEY = "class";
 	
@@ -20,7 +21,10 @@ public class ActionInvocation {
 	}
 	
 	public void init() {
-//		initAdaptor();
+		Annotation[][] annoArr = method.getParameterAnnotations();
+		Class<?>[] parameterType = method.getParameterTypes();
+		
+		
 	}
 	
 }
