@@ -3,19 +3,25 @@ package com.jason.invocate;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.util.StringUtils;
 
 import com.jason.annotation.Action;
 import com.jason.annotation.Command;
+import com.jason.log4jDemo.Log4jTest;
 import com.jason.util.AnnotationUtils;
 import com.jason.util.ScanUtils;
+import com.jason.util.Utils;
 
 public class InvocationFactory {
-
+	private static final Logger logger = Logger.getLogger(Log4jTest.class);
+	
 	private static final InvocationFactory instance = new InvocationFactory();
 	
 	private InvocationFactory() {}
@@ -26,70 +32,172 @@ public class InvocationFactory {
 	
 	private AbstractApplicationContext ac;
 	
-	// 指令名称与具体指令实现
-	private Map<String, ActionInvocation> handlerMap = new HashMap<String, ActionInvocation>();
+	protected static Map<String, ActionInvocation> handlerMap = new HashMap<String, ActionInvocation>();
 	
-	/**
-	 * 扫描path，获取action注解
-	 * @param ac
-	 * @param packagePath
-	 */
-	public void init(AbstractApplicationContext ac, String packagePath) throws Exception{
-		this.ac = ac;
+	public void init(AbstractApplicationContext ac, String packagePath) throws Exception {
 		
+		this.ac = ac;
+
 		String scanPath = packagePath;
-		if(StringUtils.isEmpty(scanPath)) {
+		if (StringUtils.isEmpty(scanPath)) {
+			logger.error("actionPackage path is null！！！！！");
 			throw new Exception();
 		}
 		
-		try{
-			initHandlerAction(packagePath);
-		}catch(Exception e) {
+		try {
+			initHandleAction(scanPath);
+//			initInterceptor();
+		}catch (Exception e) {
 			throw e;
 		}
 	}
-	
-	
-	private void initHandlerAction(String packagePath) {
-		Set<Class<?>> set = ScanUtils.getClasses(packagePath);
-		// TODO: plugin加载
-		for(Class<?> clazz: set) {
-			initHandlerAction(clazz);
+
+//	private void initInterceptor() {
+//		for (Entry<String, ActionInvocation> entry : handlerMap.entrySet()) {
+//			// 先添加默认拦截器
+//			if (!InterceptorManager.needSkipDefaultInterceptor(entry.getKey())) {
+//				entry.getValue().addInterceptor(InterceptorManager.getDefaultRule());
+//			}
+//			// 再引入定制拦截器
+//			List<Integer> ruleList = InterceptorManager.getRules(entry.getKey());
+//			if (ruleList != null && !ruleList.isEmpty()) {
+//				for (int ruleId : ruleList) {
+//					entry.getValue().addInterceptor(InterceptorManager.getInterceptor(ruleId));
+//				}
+//			}
+//		}
+//	}
+
+	private void initHandleAction(String scanPath) throws Exception {
+		Set<Class<?>> set = ScanUtils.getClasses(scanPath);
+		// 此处可导入插件Plugin，目前尚未开发
+		// 当前仅遍历路径下类文件
+		ApiMetaDao apiMetaDao = ac.getBean(ApiMetaDaoImpl.class);
+		for (Class<?> clazz : set) {
+			initHandleAction(clazz, apiMetaDao);
 		}
 	}
 
-	private void initHandlerAction(Class<?> clazz) {
-		if(!Modifier.isInterface(clazz.getModifiers())) {
+	private void initHandleAction(Class<?> clazz, ApiMetaDao apiMetaDao) throws Exception {
+//		if (Modifier.isAbstract(clazz.getModifiers()) || Modifier.isInterface(clazz.getModifiers())) {
+//			return;
+//		}
+		if (!Modifier.isInterface(clazz.getModifiers())) {
 			return;
 		}
 		
-		Action action = AnnotationUtils.getAnnotation(clazz, Action.class);
-		if(action == null) {
+		Action action = Utils.getAnnotation(clazz, Action.class);
+		if (action == null) {
 			return;
 		}
-		createActionInvocation(clazz);
+		
+		// 表示该方法只能同步访问
+		boolean isSyn = false;
+//		Syn syn = clazz.getAnnotation(Syn.class);
+//		if (syn != null) {
+//			isSyn = syn.value();
+//		}
+		
+		createActionInvocation(clazz, isSyn, apiMetaDao);
 	}
-
-	private void createActionInvocation(Class<?> clazz) {
+	
+	private void createActionInvocation(Class<?> clazz, boolean isSyn, ApiMetaDao apiMetaDao) throws Exception {
 		ActionInvocation ai;
-		String path = clazz.getName();
+ 		String path = clazz.getName();
 		Method[] methods = clazz.getMethods();
-		for(Method method : methods) {
-			int methodModifiers = method.getModifiers();
-			if(Modifier.isStatic(methodModifiers) || Modifier.isFinal(methodModifiers)) {
+		for (Method method : methods) {
+			if (Modifier.isStatic(method.getModifiers()) || Modifier.isFinal(method.getModifiers())) {
 				continue;
 			}
+			
 			Command cmd = method.getAnnotation(Command.class);
-			if(cmd == null) {
+			if (cmd == null) {
 				continue;
 			}
-			if(handlerMap.containsKey(cmd.value())) {
-				System.out.println("有同名接口啊");
+			
+//			if (handlerMap.containsKey(cmd.value())) {
+//				throw new ServletConfigException("Duplicate command exist" + cmd.value());
+//			}
+			ApiMeta apiMeta = apiMetaDao.getApiMeta(cmd.value());
+			int version = apiMeta.getVersion();
+			int state = apiMeta.getState();
+			ServiceMeta serviceMeta = JSON.parseObject(apiMeta.getServiceMeta(), ServiceMeta.class);
+			int timeout = 3000;
+			int retry = 1;
+			
+			if (serviceMeta != null) {
+				timeout = serviceMeta.getTimeout();
+				retry = serviceMeta.getRetry();
 			}
-			ai = new ActionInvocation(path, method);
+			
+			// build
+			ai = new ActionInvocation(path, method, isSyn, version, timeout, retry, state); 
+			ai.init();
+			
 			handlerMap.put(cmd.value(), ai);
+			OpLogger.getLogger().info("@@@@@regist command " + cmd.value() +" success! entityName is "+ ai.toString());
 		}
 		
+	}
+	
+	public void service(Request request, Response response) {
+		ActionInvocation invocation = handlerMap.get(request.getCommand());
+		try {
+			if (null == invocation) {
+				throw new RuntimeException("No such method，command is ："+request.getCommand());
+			}
+//			Result result = invocation.invoke(request, response);
+			byte[] result = invocation.invoke(request, response);
+			if (result != null) {
+//				byte[] resultArr = JSON.toJSONBytes(result);
+//				ActionInvocation.render(resultArr, request, response);
+				ActionInvocation.render(result, request, response);
+			}
+			afterDeal(request, response, result);
+		} catch (ValidateException ve) {
+			Result result = ResultUtil.buildResult(ve.getCode(), ve.getMessage());
+			byte[] resultArr = JSON.toJSONBytes(result);
+//			byte[] bt = t.getMessage().getBytes();
+			try {
+				ActionInvocation.render(resultArr, request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return;
+		} catch (Throwable t) {
+			if (t.getMessage() != null) {
+				Result result = ResultUtil.buildResult(ServerConstants.INTERNAL_ERROR, t.getMessage());
+				byte[] resultArr = JSON.toJSONBytes(result);
+//				byte[] bt = t.getMessage().getBytes();
+				try {
+					ActionInvocation.render(resultArr, request, response);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				return;
+			}
+			ErrLogger.getLogger().error("核心失败", t);
+			Result result = ResultUtil.buildResult(ServerConstants.INTERNAL_ERROR, "程序执行失败!", t.getLocalizedMessage());
+			byte[] resultArr = JSON.toJSONBytes(result);
+			try {
+				ActionInvocation.render(resultArr, request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+//			throw new RuntimeException(t);
+		}
+	}
+	
+	private void afterDeal(Request request, Response response, byte[] result) {
+		Result r = JSONObject.parseObject(result, Result.class);
+		if (request.getCommand().equalsIgnoreCase("user@login") && r.getCode() == ResultUtil.SUCCESS) {
+			request.getNewSession().setAttribute(Constants.USER, ((JSONObject)r.getData()).toJavaObject(UserDto.class));
+		}
+	}
+
+	public static void main(String[] args) {
+		System.out.println(ActionInvocation.class.getName());
+		System.out.println(ActionInvocation.class.getPackage().getName());
 	}
 	
 }
