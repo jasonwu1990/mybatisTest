@@ -19,40 +19,29 @@
  </body>
 </html>
 <script>
-var socket = new WebSocket("ws://localhost:9000");
+var socket = __import__('Socket', null, {})  
 
-socket.onerror = function(event){
-    console.log(event);
-    alert("WebSocketError!");
-};  
-
-// 打开Socket 
-socket.onopen = function(event) {
-    alert("连接成功！");
-	setInterval("heartBeat()", 5000);
-
-	// 监听消息
-	socket.onmessage = function(event) { 
-		console.log('Client received a message',event); 
-		if (event.data != "heartBeat")
-		{
-		    var ta = document.getElementById("response");
-		    ta.value += (event.data+"\n")
-		}
-	}; 
-
-	// 监听Socket的关闭
-	socket.onclose = function(event) {
-	    console.log('Client notified socket has closed',event); 
-		alert("与服务器断开连接!");
-	};
-};
+var client = new socket.Socket('127.0.0.1', 8000)    
+    
+client.on('read', function(socket){   
+   var echo = socket.read();          
+   print('echo from server:' + echo)   
+   socket.write("Bye!")                         
+   socket.close()       
+})   
+   
+client.on('connect', function(socket){  
+   print('connectted....')   
+   socket.write("Hello server, i'm a client!")     
+})   
+ 
+client.on('closed', function(socket){    
+   print('Bye!')   
+})   
+   
+client.connect()  
 
 function send() {
-    socket.send(document.getElementById("request").value);
-}
-
-function heartBeat() {
-    socket.send("heartBeat");
+    socket.write(document.getElementById("request").value);
 }
 </script>

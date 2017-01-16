@@ -2,17 +2,21 @@ package com.jason.user.dao;
 
 import java.util.List;
 
-import org.apache.ibatis.type.Alias;
+import org.springframework.stereotype.Component;
 
+import com.jason.dao.base.MyBatisRepository;
 import com.jason.user.dto.User;
 
-//@Alias("UserDao")
+@Component
+@MyBatisRepository
 public interface UserDao {
 
 	  public void insert(User user);
 
 	  public User findUserById (int userId);
 
+	  public User findUserByUsername (String name);
+	  
 	  public void updateUser(User user);
 	  
 	  public void deleteUser(User user);

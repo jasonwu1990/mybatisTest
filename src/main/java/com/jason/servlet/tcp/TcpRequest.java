@@ -80,7 +80,7 @@ public class TcpRequest implements Request {
 
 	@Override
 	public Object getParamterValues(String key) {
-		parseParam(content, PARSE_TYPE.JSON);
+		parseParam(content, PARSE_TYPE.URL);
 		return paramMap.get(key);
 	}
 

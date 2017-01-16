@@ -4,7 +4,12 @@ import java.net.InetSocketAddress;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigUtils;
 import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
 
 import com.jason.common.config.ServletConfig;
 import com.jason.invocate.InvocationFactory;
@@ -28,7 +33,7 @@ public class MyServer {
 		this.sc = sc;
 	}
 
-	public void run() throws Exception {
+	public void start() throws Exception {
 		// 服务器工作组
 		EventLoopGroup bossGroup = new NioEventLoopGroup(); // (1)  
 		EventLoopGroup workerGroup = new NioEventLoopGroup();  
@@ -66,13 +71,44 @@ public class MyServer {
 		}
 	}
 
-//	public static void main(String[] args) throws Exception {
-//		int port;
-//		if (args.length > 0) {
-//			port = Integer.parseInt(args[0]);
-//		} else {
-//			port = 9000;
-//		}
-//		new MyServer(port).run();
-//	}
+	public static void main(String[] args) throws Exception {
+		GenericApplicationContext  newAc = new GenericApplicationContext();
+		ApplicationContext ac = null;
+		try {
+			// 优先尝试类路径加载
+			ac = new ClassPathXmlApplicationContext("classpath*:/spring-mvc.xml");
+		}catch (BeansException be) {
+			// 如果类路径加载失败，兼容使用文件路径的方式
+//			ac = new FileSystemXmlApplicationContext(beanFiles);
+		}
+		newAc.setParent(ac);
+
+		AnnotationConfigUtils.registerAnnotationConfigProcessors(newAc);
+		newAc.refresh();
+
+		newAc.registerShutdownHook();
+		newAc.start();
+		
+//		String scanPath = Configuration.getProperty(Configuration.PACKAGE_PATH);
+		String scanPath = "com.jason";
+		InvocationFactory.getInstance().init(newAc, scanPath);
+		
+		ServletConfig sc = new ServletConfig();
+		sc.setHttpPort(8001);
+		sc.setTcpPort(8000);
+		sc.setIp("127.0.0.1");
+		sc.setPackagePath("com.jason");
+//		sc.setHttpPort(Integer.valueOf(Configuration.getProperty(Configuration.HTTP_PORT)));
+//		sc.setTcpPort(Integer.valueOf(Configuration.getProperty(Configuration.TCP_PORT)));
+//		sc.setIp(Configuration.getProperty(Configuration.IP));
+//		sc.setPackagePath(Configuration.getProperty(Configuration.PACKAGE_PATH));
+		
+		MyServer server = new MyServer(newAc, sc);
+		try {
+			server.start();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}  
+			
+	}
 }

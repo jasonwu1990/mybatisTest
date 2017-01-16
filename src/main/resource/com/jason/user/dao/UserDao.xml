@@ -8,6 +8,10 @@
     select * from user where id = #{id}
   </select>
   
+  <select id="findUserByUsername" resultType="User" > 
+    select * from user where name = #{name}
+  </select>
+  
   <insert id="insert" parameterType="User" useGeneratedKeys="true"> 
   	<!-- 自增主键添加 -->
   	<!-- selectKey keyProperty="id" resultType="int" order="AFTER" >
