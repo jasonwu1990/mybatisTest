@@ -1,5 +1,6 @@
 package com.jason.client;
 import java.io.DataOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.HashMap;
@@ -40,6 +41,16 @@ public class TcpClient {
 			dataOut.write(content);
 			os.flush();
 			testNum--;
+			
+			InputStream inputStream = s.getInputStream();
+			int count = inputStream.available();
+	        int readCount = 0; // 已经成功读取的字节的个数   
+	        byte[] result = new byte[count];
+	        while (readCount < count) {    
+	        	readCount += inputStream.read(result, readCount, count - readCount);    
+	        }
+	        inputStream.close();
+			
 			Thread.currentThread();
 			Thread.sleep(30*1000l);
 		}

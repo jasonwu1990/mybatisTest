@@ -86,10 +86,15 @@ public class InvocationFactory {
 	}
 	
 	private void createActionInvocation(Class<?> clazz, boolean isSyn) throws Exception {
+		Object obj = ac.getBean(clazz);
+		if(obj == null) {
+			 obj = clazz.newInstance();
+		}
+		
 		ActionInvocation ai;
  		String path = clazz.getName();
 		Method[] methods = clazz.getMethods();
-		Object obj = clazz.newInstance();
+		
 		for (Method method : methods) {
 			if (Modifier.isStatic(method.getModifiers()) || Modifier.isFinal(method.getModifiers())) {
 				continue;

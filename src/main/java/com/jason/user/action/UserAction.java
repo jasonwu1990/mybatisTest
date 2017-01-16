@@ -1,6 +1,7 @@
 package com.jason.user.action;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import com.jason.annotation.Action;
@@ -12,6 +13,7 @@ import com.jason.user.dto.User;
 import com.jason.user.service.IUserService;
 import com.jason.util.ResultUtil;
 
+@Component
 @Action
 public class UserAction {
 	
