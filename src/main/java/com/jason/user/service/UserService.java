@@ -20,6 +20,7 @@ public class UserService implements IUserService {
 	      return user;
 	}
 	
+	@Override
 	public Result login(String username, String password) {
 		User user = userDao.findUserByUsername(username);
 		if (user == null) {
@@ -29,6 +30,12 @@ public class UserService implements IUserService {
 			return ResultUtil.buildResultSucc(user);
 //		}
 //		return ResultUtil.buildResultFail("Password error!");
+	}
+
+	@Override
+	public Result register(String username, String password, int age) {
+		
+		return null;
 	}
 
 }

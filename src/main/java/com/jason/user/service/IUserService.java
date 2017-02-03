@@ -9,4 +9,6 @@ public interface IUserService {
 
 	Result login(String username, String password);
 
+	Result register(String username, String password, int age);
+
 }
