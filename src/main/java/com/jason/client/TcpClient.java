@@ -13,9 +13,9 @@ public class TcpClient {
 		OutputStream os = s.getOutputStream();
 		int request = 0;
 		int testNum = 100;
-		while(testNum > 0) {
+//		while(testNum > 0) {
 			DataOutputStream dataOut = new DataOutputStream(os);
-			String command = "user@login";
+			String command = "user@regist";
 			byte[] commandBytes = new byte[32];
 			byte[] beforeCommBytes = command.getBytes("UTF-8");
 			for(int tag = 0; tag <beforeCommBytes.length; tag++) {
@@ -24,8 +24,9 @@ public class TcpClient {
 			request++;
 			
 			Map<String, String> contentMap = new HashMap<String, String>();
-			contentMap.put("username", "final");
+			contentMap.put("username", "wufan");
 			contentMap.put("password", "123");
+			contentMap.put("age", "18");
 			StringBuffer sb = new StringBuffer();
 			for(Entry<String, String> entry : contentMap.entrySet()) {
 				if(sb.length() > 0) {
@@ -51,9 +52,9 @@ public class TcpClient {
 	        }
 	        inputStream.close();
 			
-			Thread.currentThread();
-			Thread.sleep(30*1000l);
-		}
+//			Thread.currentThread();
+//			Thread.sleep(30*1000l);
+//		}
 		os.close();
 		s.close();
 	}

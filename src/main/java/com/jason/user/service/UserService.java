@@ -34,8 +34,16 @@ public class UserService implements IUserService {
 
 	@Override
 	public Result register(String username, String password, int age) {
-		
-		return null;
+		User user = userDao.findUserByUsername(username);
+		if(user != null) {
+			return ResultUtil.buildResultFail("invalid username!");
+		}
+		user = new User();
+		user.setName(username);
+		user.setPassword(password);
+		user.setAge(age);
+		userDao.insert(user);
+		return ResultUtil.buildResultSucc(user);
 	}
 
 }
