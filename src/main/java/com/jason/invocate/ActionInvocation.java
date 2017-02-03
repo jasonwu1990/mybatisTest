@@ -64,8 +64,8 @@ public class ActionInvocation {
 	protected byte[] _invoke(Request request, Response response) throws Exception {
 		
 		Object[] params = adapt(request);
-		Result result = (Result) method.invoke(obj, params);
-		return dealResult(result);
+		byte[] result = (byte[]) method.invoke(obj, params);
+		return result;
 	}
 
 	private byte[] dealResult(Object result) {

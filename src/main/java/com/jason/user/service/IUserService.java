@@ -7,8 +7,8 @@ public interface IUserService {
 
 	User getUserById(int userId);
 
-	Result login(String username, String password);
+	byte[] login(String username, String password);
 
-	Result register(String username, String password, int age);
+	byte[] register(String username, String password, int age);
 
 }
