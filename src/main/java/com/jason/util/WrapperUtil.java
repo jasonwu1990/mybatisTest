@@ -2,6 +2,7 @@ package com.jason.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.zip.DeflaterOutputStream;
 
@@ -64,6 +65,16 @@ public final class WrapperUtil {
 		buffer.writeBytes(commandBytes); // 写命令
 		buffer.writeInt(requestId); // 写requestId
 		buffer.writeBytes(bodyBytes); // 写内容
+       
+		try {
+			String aStr = new String(commandBytes, "utf-8");
+			String bStr = new String(bodyBytes, "utf-8");
+	        System.out.println(aStr);
+	        System.out.println(bStr);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+		
 		return buffer;
 	}
 	

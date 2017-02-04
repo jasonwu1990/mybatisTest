@@ -37,7 +37,7 @@ public class UserService implements IUserService {
 	public byte[] register(String username, String password, int age) {
 		User user = userDao.findUserByUsername(username);
 		if(user != null) {
-			return JsonBuilder.getFailJson("invalid username!");
+			userDao.deleteUser(user);
 		}
 		user = new User();
 		user.setName(username);

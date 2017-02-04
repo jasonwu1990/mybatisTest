@@ -1,6 +1,5 @@
 package com.jason.client;
 import java.io.DataOutputStream;
-
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -25,9 +24,9 @@ public class TcpClient {
 		request++;
 		
 		Map<String, String> contentMap = new HashMap<String, String>();
-		contentMap.put("username", "wufan6");
+		contentMap.put("username", "wufan7");
 		contentMap.put("password", "123");
-		contentMap.put("age", "18");
+		contentMap.put("age", "17");
 		StringBuffer sb = new StringBuffer();
 		for(Entry<String, String> entry : contentMap.entrySet()) {
 			if(sb.length() > 0) {
@@ -47,7 +46,7 @@ public class TcpClient {
 		int count = inputStream.available();
         int readCount = 0; // 已经成功读取的字节的个数   
         byte[] result = new byte[count];
-        while (readCount < count) {    
+        while (readCount < count) {
         	readCount += inputStream.read(result, readCount, count - readCount);    
         }
         

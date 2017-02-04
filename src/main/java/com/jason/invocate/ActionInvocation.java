@@ -11,7 +11,6 @@ import com.alibaba.fastjson.JSON;
 import com.jason.adaptor.Adaptor;
 import com.jason.annotation.RequestParam;
 import com.jason.common.RequestParamAdaptor;
-import com.jason.mvc.view.Result;
 import com.jason.servlet.Request;
 import com.jason.servlet.Response;
 import com.jason.session.ServerProtocol;
@@ -130,11 +129,9 @@ public class ActionInvocation {
 		if (ServerProtocol.TCP.equals(response.getProtocol())) {
 			response.write(WrapperUtil.wrapper(request.getCommand(), request.getRequestId(), result));
 		} else if (ServerProtocol.HTTP.equals(response.getProtocol())) {
-			// TODO:HTTP
 //			response.write(WrapperUtil.wrapper(request.getCommand(), request.getRequestId(), result));
 			response.write(result);
 		} else if (ServerProtocol.WEBSOCKET.equals(response.getProtocol())) {
-			// TODO:WEB SOCKET
 			response.write(WrapperUtil.wrapperWebSocketTextFrame(request.getCommand(), request.getRequestId(), result));
 		}
 	}

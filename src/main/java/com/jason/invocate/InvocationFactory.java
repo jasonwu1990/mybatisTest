@@ -127,7 +127,7 @@ public class InvocationFactory {
 //				ActionInvocation.render(resultArr, request, response);
 				ActionInvocation.render(result, request, response);
 			}
-			afterDeal(request, response, result);
+//			afterDeal(request, response, result);
 		} catch (Throwable t) {
 			throw new RuntimeException(t);
 		}
