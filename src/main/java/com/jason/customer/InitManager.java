@@ -30,7 +30,7 @@ public class InitManager{
 			server.start();
 		} catch (Exception e) {
 			e.printStackTrace();
-		}		
+		}
 	}
 
 

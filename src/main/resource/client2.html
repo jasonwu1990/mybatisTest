@@ -14,12 +14,12 @@
   <textarea id="response" style="width:500px;height:300px;"></textarea>
   <br>
   <h3>发送内容</h3>
-  <input id="request" type="text" style="width:200px;" value='{"cmd":"test", "module":"test", "data":{"id":"1", "name":"Jason"}}'/>
+  <input id="request" type="text" style="width:500px;" value='requestId=1&command=regist&username=test2&password=124&age=321'/>
   <input id="send" type="button" value="发送" onclick="send();"/>
  </body>
 </html>
 <script>
-var socket = new WebSocket("ws://localhost:9000");
+var socket = new WebSocket("ws://localhost:8082");
 
 socket.onerror = function(event){
     console.log(event);
@@ -29,7 +29,7 @@ socket.onerror = function(event){
 // 打开Socket 
 socket.onopen = function(event) {
     alert("连接成功！");
-	setInterval("heartBeat()", 5000);
+//	setInterval("heartBeat()", 5000);
 
 	// 监听消息
 	socket.onmessage = function(event) { 

@@ -13,6 +13,7 @@ import org.springframework.context.support.GenericApplicationContext;
 
 import com.jason.common.config.ServletConfig;
 import com.jason.invocate.InvocationFactory;
+import com.jason.netty.http.HttpServletChannelHandler;
 import com.jason.netty.tcp.TcpServletChannelHandler;
 import com.jason.session.SessionManager;
 
@@ -56,11 +57,27 @@ public class MyServer {
 			
 			ChannelFuture f1 = b.bind(new InetSocketAddress(sc.getIp() , sc.getTcpPort())).sync(); // (7)  绑定端口
 
-			logger.info("Netty server has started on port : " + sc.getTcpPort());
+			logger.info("Netty server has started on tcp port : " + sc.getTcpPort());
+			
+			ServerBootstrap httpB = new ServerBootstrap();
+			httpB.group(httpBossGroup, httpWorkerGroup);
+			httpB.channel(NioServerSocketChannel.class);
+			HttpServletChannelHandler httpChannel = new HttpServletChannelHandler();
+			httpChannel.init(servlet);
+			
+			httpB.childHandler(httpChannel)
+			.option(ChannelOption.SO_BACKLOG, 128)          // (5)  监听socket设置
+			.childOption(ChannelOption.SO_KEEPALIVE, true) // (6)  客户端socket设置
+			.childOption(ChannelOption.TCP_NODELAY, true);
+			
+			ChannelFuture f2 = httpB.bind(new InetSocketAddress(sc.getIp() , sc.getHttpPort())).sync(); // (7)  绑定端口
+
+			logger.info("Netty server has started on http port : " + sc.getHttpPort());
 
 			SessionManager.getInstance().startSessionCheckThread();
 			
 			f1.channel().closeFuture().sync();
+			f2.channel().closeFuture().sync();
 			System.out.println("close");
 		}
 		finally {

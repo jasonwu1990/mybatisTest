@@ -21,7 +21,7 @@ public class UserAction {
 	private IUserService userService;
 	
 
-	@Command(value="user@regist")
+	@Command(value="regist")
 	public byte[] regist(@RequestParam("username") String username, 
 			@RequestParam(value="password") String password,
 			@RequestParam("age") int age) {
