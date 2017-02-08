@@ -15,7 +15,7 @@ public class TcpClient {
 		OutputStream os = s.getOutputStream();
 		int request = 0;
 		DataOutputStream dataOut = new DataOutputStream(os);
-		String command = "user@regist";
+		String command = "regist";
 		byte[] commandBytes = new byte[32];
 		byte[] beforeCommBytes = command.getBytes("UTF-8");
 		for(int tag = 0; tag <beforeCommBytes.length; tag++) {
