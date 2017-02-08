@@ -40,11 +40,11 @@ public class WebSocketServerHandler extends ChannelInboundHandlerAdapter{
 	}
 	
 	@Override  
-	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) { // (4)  
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
 		if (! (cause instanceof ClosedChannelException)) {
 			System.out.println("websocket error channel, channel name="+ctx.name());
 		}
-	} 
+	}
 	
 	@Override
 	public void channelRead(final ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -100,5 +100,5 @@ public class WebSocketServerHandler extends ChannelInboundHandlerAdapter{
 		}
 		r.setContent(text.getBytes());
 		return r;
-	} 
+	}
 }

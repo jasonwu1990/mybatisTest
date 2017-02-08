@@ -8,10 +8,7 @@ import com.jason.common.ServerConstants;
 import com.jason.invocate.InvocationFactory;
 import com.jason.servlet.Request;
 import com.jason.servlet.Response;
-import com.jason.servlet.tcp.TcpPush;
 import com.jason.servlet.ws.WebSocketServerHandler;
-import com.jason.session.Session;
-import com.jason.session.SessionManager;
 import com.jason.util.HttpUtil;
 import com.jason.util.Tuple;
 import com.jason.util.WebUtils;
@@ -20,9 +17,11 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.handler.codec.TooLongFrameException;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
@@ -133,22 +132,25 @@ public class HttpServerHandler extends ChannelInboundHandlerAdapter { // (1)
     
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-    	System.out.println("chanel actived "+ctx.name());
-    	String sessionId = ctx.channel().attr(ServerConstants.SESSIONID).get();
-    	if (sessionId == null) {
-    		Session session = SessionManager.getInstance().getSession(null, true);
-    		session.setPush(new TcpPush(ctx.channel()));
-    		ctx.channel().attr(ServerConstants.SESSIONID).set(session.getId());
-    		System.err.println("session create "+session.id);
-    	}
+//    	System.out.println("chanel actived "+ctx.name());
+//    	String sessionId = ctx.channel().attr(ServerConstants.SESSIONID).get();
+//    	if (sessionId == null) {
+//    		Session session = SessionManager.getInstance().getSession(null, true);
+//    		session.setPush(new TcpPush(ctx.channel()));
+//    		ctx.channel().attr(ServerConstants.SESSIONID).set(session.getId());
+//    		System.err.println("session create "+session.id);
+//    	}
     }
   
     @Override  
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) { // (4)  
         // Close the connection when an exception is raised.  
-//        cause.printStackTrace();  
-//        ErrLogger.getLogger().error(cause);
-        ctx.flush();
-//        ctx.close();  
+        cause.printStackTrace();  
+        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+        if (cause instanceof TooLongFrameException) {
+        	response.content().writeBytes("Too long frame".getBytes());
+        }
+		ctx.channel().writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
+        ctx.close();  
     }
 } 

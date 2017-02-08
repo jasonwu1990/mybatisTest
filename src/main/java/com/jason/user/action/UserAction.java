@@ -21,7 +21,7 @@ public class UserAction {
 	private IUserService userService;
 	
 
-	@Command(value="regist")
+	@Command(value="userRegist")
 	public byte[] regist(@RequestParam("username") String username, 
 			@RequestParam(value="password") String password,
 			@RequestParam("age") int age) {
@@ -32,7 +32,7 @@ public class UserAction {
 		return result;
 	}
 	
-	@Command(value="user@login")
+	@Command(value="userLogin")
 	public byte[] login(@RequestParam("username")String username, 
 			@RequestParam("password")String password) {
 		if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
@@ -47,7 +47,7 @@ public class UserAction {
 //		return ResultUtil.buildResultSucc(dto);
 	}
 
-	@Command(value="user@read")
+	@Command(value="userRead")
 	public Result read(@RequestParam("id") int id) {
 		User user = userService.getUserById(id);
 		return ResultUtil.buildResultSucc(user);

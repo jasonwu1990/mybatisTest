@@ -45,13 +45,12 @@ public class TcpPush implements Push {
 
 	@Override
 	public void heartbeat() {
-		String command = "heart@heartBeat";
+		String command = "heartBeat";
 		channel.write(WrapperUtil.wrapper(command, 0, command.getBytes()));
 	}
 
 	@Override
 	public ServerProtocol getPushProtocol() {
-		// TODO Auto-generated method stub
 		return ServerProtocol.TCP;
 	}
 
