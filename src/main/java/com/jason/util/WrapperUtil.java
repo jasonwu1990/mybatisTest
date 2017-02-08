@@ -6,8 +6,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.zip.DeflaterOutputStream;
 
-import com.jason.common.ServerConstants;
-import com.jason.request.RequestMessage;
+import com.jason.framework.common.ServerConstants;
+import com.jason.framework.netty.protocol.RequestMessage;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;

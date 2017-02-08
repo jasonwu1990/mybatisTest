@@ -1,8 +1,9 @@
 package com.jason.customer;
 
 import org.springframework.context.support.AbstractApplicationContext;
-import com.jason.common.Configuration;
-import com.jason.invocate.InvocationFactory;
+
+import com.jason.framework.common.Configuration;
+import com.jason.framework.netty.invocate.InvocationFactory;
 
 
 public class InvocationInitManager {

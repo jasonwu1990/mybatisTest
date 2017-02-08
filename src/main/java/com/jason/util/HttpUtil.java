@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.jason.servlet.Request;
-import com.jason.servlet.Response;
+import com.jason.framework.netty.servlet.Request;
+import com.jason.framework.netty.servlet.Response;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;

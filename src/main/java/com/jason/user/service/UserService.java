@@ -3,8 +3,8 @@ package com.jason.user.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.jason.framework.json.JsonBuilder;
-import com.jason.framework.json.JsonDocument;
+import com.jason.framework.common.json.JsonBuilder;
+import com.jason.framework.common.json.JsonDocument;
 import com.jason.mvc.view.ResultState;
 import com.jason.user.dao.UserDao;
 import com.jason.user.dto.User;

@@ -1,9 +1,10 @@
 package com.jason.customer;
 
 import org.springframework.context.support.AbstractApplicationContext;
-import com.jason.common.Configuration;
-import com.jason.common.config.ServletConfig;
-import com.jason.netty.MyServer;
+
+import com.jason.framework.common.Configuration;
+import com.jason.framework.common.config.ServletConfig;
+import com.jason.framework.netty.server.MyServer;
 
 
 public class InitManager{

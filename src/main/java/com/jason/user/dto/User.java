@@ -1,8 +1,6 @@
 package com.jason.user.dto;
 
-import org.apache.ibatis.type.Alias;
-
-import com.jason.framework.json.JsonDocument;
+import com.jason.framework.common.json.JsonDocument;
 
 //@Alias("User")
 public class User {

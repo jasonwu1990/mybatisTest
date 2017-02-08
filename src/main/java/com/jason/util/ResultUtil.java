@@ -1,6 +1,6 @@
 package com.jason.util;
 
-import com.jason.servlet.Result;
+import com.jason.framework.netty.servlet.Result;
 
 public class ResultUtil {
 	

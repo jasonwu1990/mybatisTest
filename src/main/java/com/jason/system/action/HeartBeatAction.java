@@ -2,9 +2,9 @@ package com.jason.system.action;
 
 import org.springframework.stereotype.Component;
 
-import com.jason.annotation.Action;
-import com.jason.annotation.Command;
-import com.jason.framework.json.JsonBuilder;
+import com.jason.framework.common.json.JsonBuilder;
+import com.jason.framework.netty.annotation.Action;
+import com.jason.framework.netty.annotation.Command;
 import com.jason.mvc.view.ResultState;
 
 @Component

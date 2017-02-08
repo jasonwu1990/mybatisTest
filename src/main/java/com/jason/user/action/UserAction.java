@@ -4,11 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import com.jason.annotation.Action;
-import com.jason.annotation.Command;
-import com.jason.annotation.RequestParam;
-import com.jason.framework.json.JsonBuilder;
-import com.jason.servlet.Result;
+import com.jason.framework.common.json.JsonBuilder;
+import com.jason.framework.netty.annotation.Action;
+import com.jason.framework.netty.annotation.Command;
+import com.jason.framework.netty.annotation.RequestParam;
+import com.jason.framework.netty.servlet.Result;
 import com.jason.user.dto.User;
 import com.jason.user.service.IUserService;
 import com.jason.util.ResultUtil;
