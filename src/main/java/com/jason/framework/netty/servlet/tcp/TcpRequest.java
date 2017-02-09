@@ -128,18 +128,18 @@ public class TcpRequest implements Request {
 
 	@Override
 	public <T>Object getAttachment(AttributeKey<T> key) {
-		return ctx.attr(key);
+		return ctx.channel().attr(key);
 	}
 
 	@Override
 	public void setSessionId(String sessionId) {
-		ctx.attr(ServerConstants.SESSIONID).set(sessionId);
+		ctx.channel().attr(ServerConstants.SESSIONID).set(sessionId);
 		this.sessionId = sessionId;
 	}
 
 	@Override
 	public <T> void setAttachment(AttributeKey<T> key, T obj) {
-		ctx.attr(key).set(obj);
+		ctx.channel().attr(key).set(obj);
 	}
 
 	@Override
