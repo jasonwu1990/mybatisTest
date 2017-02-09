@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.jason.mybatis.MyBatisRepository;
+import com.jason.mybatis.annotation.MyBatisRepository;
 import com.jason.user.dto.User;
 
 @Component

@@ -1,4 +1,4 @@
-package com.jason.mybatis;
+package com.jason.mybatis.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
