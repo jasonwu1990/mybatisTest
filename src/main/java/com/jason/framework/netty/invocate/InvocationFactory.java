@@ -39,7 +39,6 @@ public class InvocationFactory {
 	protected static Map<String, ActionInvocation> handlerMap = new HashMap<String, ActionInvocation>();
 	
 	public void init(AbstractApplicationContext ac, String packagePath) throws Exception {
-		
 		this.ac = ac;
 
 		String scanPath = packagePath;
@@ -49,12 +48,17 @@ public class InvocationFactory {
 		}
 		
 		try {
+			initInterceptorList();
 			initHandleAction(scanPath);
 		}catch (Exception e) {
 			throw e;
 		}
 	}
 
+	private void initInterceptorList() {
+		
+	}
+	
 	private void initHandleAction(String scanPath) throws Exception {
 		Set<Class<?>> set = ScanUtils.getClasses(scanPath);
 		for (Class<?> clazz : set) {
