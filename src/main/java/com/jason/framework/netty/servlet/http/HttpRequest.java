@@ -80,15 +80,10 @@ public class HttpRequest implements Request {
 			this.command = command;
 		}
 		
-		this.sessionId = getCookieValue(ServerConstants.SESSION_KEY);
-		SessionManager.getInstance().access(sessionId);
+//		this.sessionId = getCookieValue(ServerConstants.SESSION_KEY);
+//		SessionManager.getInstance().access(sessionId);
 		
 		if (ServerConstants.LONG_HTTP.equalsIgnoreCase(this.command)) {
-			Session session = getSession(false);
-			if (null != session) {
-//				HttpPush push = new HttpPush(channel, new HttpChunkAction(ctx, httpRequest));
-//				session.setPush(push);
-			}
 			this.longHttp = true;
 		}
 	} 
@@ -159,7 +154,7 @@ public class HttpRequest implements Request {
 
 	@Override
 	public Session getSession() {
-		return getSession(false);
+		return getSession(true);
 	}
 
 	@Override

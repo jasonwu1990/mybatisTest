@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.jason.framework.common.PARSE_TYPE;
+import com.jason.framework.common.ServerConstants;
 import com.jason.framework.netty.protocol.RequestMessage;
 import com.jason.framework.netty.servlet.Request;
 import com.jason.framework.netty.servlet.Response;
@@ -20,6 +21,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.cookie.Cookie;
+import io.netty.handler.codec.http.cookie.DefaultCookie;
 import io.netty.util.AttributeKey;
 
 public class WebSocketRequest implements Request{
@@ -58,9 +60,6 @@ public class WebSocketRequest implements Request{
 		this.command = rm.getCommand();
 		this.content = rm.getContent();
 		this.url = ip;
-		
-		sessionId = rm.getSessionId();
-		SessionManager.getInstance().access(sessionId);
 	}
 
 	private void parseParam(byte[] bytes, PARSE_TYPE type) {
@@ -102,20 +101,28 @@ public class WebSocketRequest implements Request{
 
 	@Override
 	public Session getSession() {
-		// TODO Auto-generated method stub
-		return null;
+		return getSession(true);
 	}
 
 	@Override
 	public Session getSession(boolean allowCreate) {
-		// TODO Auto-generated method stub
-		return null;
+		System.out.println("now SessionId="+sessionId);
+		Session session = SessionManager.getInstance().getSession(sessionId, allowCreate);
+		if (allowCreate && (null != session && !session.getId().equals(sessionId))) {
+			// 以前没有session 或者以前的session 失效了
+			sessionId = session.getId();
+			session.setPush(new TcpPush(channel));
+		}
+		if (session != null) {
+			session.access();
+		}
+		
+		return session;
 	}
 
 	@Override
 	public Session getNewSession() {
-		// TODO Auto-generated method stub
-		return null;
+		return getSession(true);
 	}
 
 	@Override

@@ -1,12 +1,13 @@
 package com.jason.user.service;
 
 import com.jason.user.dto.User;
+import com.jason.util.stl.Tuple;
 
 public interface IUserService {
 
-	User getUserById(int userId);
+	byte[] getUserById(int userId);
 
-	byte[] login(String username, String password);
+	Tuple<User, byte[]> login(String username, String password);
 
 	byte[] register(String username, String password, int age);
 

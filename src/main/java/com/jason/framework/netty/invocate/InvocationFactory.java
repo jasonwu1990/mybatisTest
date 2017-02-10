@@ -120,23 +120,12 @@ public class InvocationFactory {
 			if (null == invocation) {
 				throw new RuntimeException("No such method，command is ："+request.getCommand());
 			}
-//			Result result = invocation.invoke(request, response);
-			byte[] result = invocation.invoke(request, response);
+			byte[] result = invocation.invoke(request, response).getResult();
 			if (result != null) {
-//				byte[] resultArr = JSON.toJSONBytes(result);
-//				ActionInvocation.render(resultArr, request, response);
 				ActionInvocation.render(result, request, response);
 			}
-//			afterDeal(request, response, result);
 		} catch (Throwable t) {
 			throw new RuntimeException(t);
-		}
-	}
-	
-	private void afterDeal(Request request, Response response, byte[] result) {
-		Result r = JSONObject.parseObject(result, Result.class);
-		if (request.getCommand().equalsIgnoreCase("user@login") && r.getCode() == ResultUtil.SUCCESS) {
-			request.getNewSession().setAttribute(Constants.USER, ((JSONObject)r.getData()).toJavaObject(UserDto.class));
 		}
 	}
 

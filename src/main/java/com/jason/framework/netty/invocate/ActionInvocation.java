@@ -7,13 +7,16 @@ import java.util.List;
 
 import org.junit.Rule;
 
-import com.alibaba.fastjson.JSON;
 import com.jason.framework.netty.adaptor.Adaptor;
+import com.jason.framework.netty.adaptor.RequestAdaptor;
 import com.jason.framework.netty.adaptor.RequestParamAdaptor;
+import com.jason.framework.netty.adaptor.ResponseAdaptor;
 import com.jason.framework.netty.annotation.RequestParam;
 import com.jason.framework.netty.servlet.Request;
 import com.jason.framework.netty.servlet.Response;
 import com.jason.framework.session.ServerProtocol;
+import com.jason.framework.session.Session;
+import com.jason.mvc.view.ByteResult;
 import com.jason.util.WrapperUtil;
 
 public class ActionInvocation {
@@ -50,9 +53,10 @@ public class ActionInvocation {
 		initParam();
 	}
 	
-	public byte[] invoke(Request request, Response response) throws Exception {
-		if (syn) {
-			synchronized(request.getSession()) {
+	public ByteResult invoke(Request request, Response response) throws Exception {
+		Session session = request.getSession(false);
+		if (syn && session != null) {
+			synchronized(session) {
 				return _invoke(request, response);
 			}
 		}else {
@@ -60,28 +64,12 @@ public class ActionInvocation {
 		}
 	}
 
-	protected byte[] _invoke(Request request, Response response) throws Exception {
+	protected ByteResult _invoke(Request request, Response response) throws Exception {
 		
-		Object[] params = adapt(request);
-		byte[] result = (byte[]) method.invoke(obj, params);
+		Object[] params = adapt(request, response);
+		ByteResult result = (ByteResult) method.invoke(obj, params);
 		return result;
 	}
-
-	private byte[] dealResult(Object result) {
-		if (result == null) {
-			return null;
-		}
-//		if (result instanceof Map<?, ?>) {
-//            removeKey((Map<?, ?>) result, CLASS_KEY, new SameObjectChecker());
-//        } else if (result instanceof Collection<?>) {
-//            removeKey((Collection<?>) result, CLASS_KEY, new SameObjectChecker());
-//        } else if (result instanceof Object[]) {
-//            removeKey((Object[]) result, CLASS_KEY, new SameObjectChecker());
-//        }
-		
-		return JSON.toJSONBytes(result);
-	}
-
 
 	protected void initParam() {
 		Annotation[][] annoArr = method.getParameterAnnotations();
@@ -98,25 +86,28 @@ public class ActionInvocation {
 				}
 			}
 			
-			if (requestParam == null) {
-				continue;
-			}
-			
 			if (requestParam != null) {
 				paramsAdaptors[count] = new RequestParamAdaptor(requestParam.value(), parameterTypes[count]);
+			}else {
+				if(Request.class.isAssignableFrom(parameterTypes[count])) {
+					paramsAdaptors[count] = new RequestAdaptor(parameterTypes[count]);
+				}
+				if(Response.class.isAssignableFrom(parameterTypes[count])) {
+					paramsAdaptors[count] = new ResponseAdaptor(parameterTypes[count]);
+				}
 			}
 			
 		}
 
 	}
 	
-	private Object[] adapt(Request request) {
+	private Object[] adapt(Request request, Response response) {
 		if (paramsAdaptors.length <= 0) {
 			return new Object[] {};
 		}
 		Object[] parameters = new Object[paramsAdaptors.length];
 		for (int i = 0; i < paramsAdaptors.length; i++) {
-			parameters[i] = paramsAdaptors[i].get(request);
+			parameters[i] = paramsAdaptors[i].get(request, response);
 		}
 		return parameters;
 	}

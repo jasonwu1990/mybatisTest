@@ -8,6 +8,7 @@ import com.jason.framework.common.json.JsonDocument;
 import com.jason.mvc.view.ResultState;
 import com.jason.user.dao.UserDao;
 import com.jason.user.dto.User;
+import com.jason.util.stl.Tuple;
 
 @Component
 public class UserService implements IUserService {
@@ -16,21 +17,28 @@ public class UserService implements IUserService {
 	private UserDao userDao;
 	
 	@Override
-	public User getUserById(int userId) {
+	public byte[] getUserById(int userId) {
 	      User user = userDao.findUserById(userId);
-	      return user;
+	      if(user == null) {
+	    	  return JsonBuilder.getFailJson("No such user!"); 
+	      }
+	      JsonDocument doc = new JsonDocument();
+	      doc.startObject();
+	      doc.createElement("username", user.getName());
+	      doc.endObject();
+	      return JsonBuilder.getJson(ResultState.SUCCESS, doc.toByte());
 	}
 	
 	@Override
-	public byte[] login(String username, String password) {
+	public Tuple<User, byte[]> login(String username, String password) {
+		Tuple<User, byte[]> tuple = new Tuple<User, byte[]> ();
 		User user = userDao.findUserByUsername(username);
 		if (user == null) {
-			return JsonBuilder.getFailJson("No such user!");
+			tuple.right = JsonBuilder.getFailJson("No such user!");
+			return tuple;
 		}
-//		if (user.getPassword().equals(MD5Util.getMD5Code(password, MD5Util.ENCODE_SIMPLE))) {
-		return JsonBuilder.getJson(ResultState.SUCCESS, "");
-//		}
-//		return ResultUtil.buildResultFail("Password error!");
+		tuple.left = user;
+		return tuple;
 	}
 
 	@Override
@@ -51,7 +59,6 @@ public class UserService implements IUserService {
 		doc.endObject();
 		
 		return JsonBuilder.getJson(ResultState.SUCCESS, doc.toByte());
-		
 	}
 
 }

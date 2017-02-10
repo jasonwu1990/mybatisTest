@@ -1,4 +1,4 @@
-package com.jason.util;
+package com.jason.util.stl;
 
 /**
  * 二元组

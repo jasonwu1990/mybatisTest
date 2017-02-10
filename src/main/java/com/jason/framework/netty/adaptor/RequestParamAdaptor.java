@@ -1,6 +1,7 @@
 package com.jason.framework.netty.adaptor;
 
 import com.jason.framework.netty.servlet.Request;
+import com.jason.framework.netty.servlet.Response;
 import com.jason.util.Utils;
 
 public class RequestParamAdaptor extends Adaptor {
@@ -15,7 +16,7 @@ public class RequestParamAdaptor extends Adaptor {
 	}
 	
 	@Override
-	public Object get(Request request) {
+	public Object get(Request request, Response response) {
 		Object obj = request.getParamterValues(name);
 		try {
 			return Utils.cast(obj, type);

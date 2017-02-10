@@ -58,7 +58,7 @@ public class WebSocketServerHandler extends ChannelInboundHandlerAdapter{
 				// 二进制协议
 				BinaryWebSocketFrame binaryFrame = (BinaryWebSocketFrame) frame;
 				RequestMessage message = decodeBinaryData(binaryFrame.content());
-				message.setSessionId(ctx.channel().attr(ServerConstants.SESSIONID).get());
+//				message.setSessionId(ctx.channel().attr(ServerConstants.SESSIONID).get());
 				
 //				Response response = new WebSocketResponse(ctx.channel(), message);
 //				Request request = new WebSocketRequest(ctx, message, ip, true);
@@ -67,8 +67,6 @@ public class WebSocketServerHandler extends ChannelInboundHandlerAdapter{
 			} else if (frame instanceof TextWebSocketFrame) {
 				TextWebSocketFrame txtFrame = (TextWebSocketFrame)frame;
 				RequestMessage message = decodeTextData(txtFrame.text());
-//				RequestMessage message = decodeBinaryData(txtFrame.content());
-				message.setSessionId(ctx.channel().attr(ServerConstants.SESSIONID).get());
 				
 				Response response = new WebSocketResponse(ctx.channel(), message);
 				Request request = new WebSocketRequest(ctx, message, ip, true);

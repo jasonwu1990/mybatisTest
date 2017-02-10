@@ -51,8 +51,8 @@ public class TcpRequest implements Request {
 		this.command = rm.getCommand();
 		this.content = rm.getContent();
 		
-		sessionId = rm.getSessionId();
-		SessionManager.getInstance().access(sessionId);
+//		sessionId = rm.getSessionId();
+//		SessionManager.getInstance().access(sessionId);
 	}
 	
 	@Override
@@ -107,7 +107,6 @@ public class TcpRequest implements Request {
 
 	@Override
 	public Session getNewSession() {
-//		throw new UnsupportedOperationException("tcp request can not support this operation!");
 		return getSession(true);
 	}
 

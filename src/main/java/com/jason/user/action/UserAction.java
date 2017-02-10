@@ -4,14 +4,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import com.jason.framework.common.Constants;
+import com.jason.framework.common.dto.UserDto;
 import com.jason.framework.common.json.JsonBuilder;
+import com.jason.framework.common.json.JsonDocument;
 import com.jason.framework.netty.annotation.Action;
 import com.jason.framework.netty.annotation.Command;
 import com.jason.framework.netty.annotation.RequestParam;
-import com.jason.framework.netty.servlet.Result;
+import com.jason.framework.netty.servlet.Request;
+import com.jason.framework.session.Session;
+import com.jason.mvc.view.ByteResult;
+import com.jason.mvc.view.ResultState;
 import com.jason.user.dto.User;
 import com.jason.user.service.IUserService;
-import com.jason.util.ResultUtil;
+import com.jason.util.stl.Tuple;
 
 @Component
 @Action
@@ -22,35 +28,43 @@ public class UserAction {
 	
 
 	@Command(value="userRegist")
-	public byte[] regist(@RequestParam("username") String username, 
+	public ByteResult regist(@RequestParam("username") String username, 
 			@RequestParam(value="password") String password,
 			@RequestParam("age") int age) {
 		if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
-			return JsonBuilder.getFailJson("Username and password can't be empty");
+			return new ByteResult(JsonBuilder.getFailJson("Username and password can't be empty"));
 		}
 		byte[] result = userService.register(username, password, age);
-		return result;
+		return new ByteResult(result);
 	}
 	
 	@Command(value="userLogin")
-	public byte[] login(@RequestParam("username")String username, 
-			@RequestParam("password")String password) {
+	public ByteResult login(@RequestParam("username")String username, 
+			@RequestParam("password")String password,
+			Request request) {
 		if (StringUtils.isEmpty(username) || StringUtils.isEmpty(password)) {
-			return JsonBuilder.getFailJson("Username and password can't be empty");
+			return new ByteResult(JsonBuilder.getFailJson("Username and password can't be empty"));
 		}
-		byte[] result = userService.login(username, password);
-//		if (result.getCode() != ResultUtil.SUCCESS) {
-			return result;
-//		}
-//		User user = (User)result.getData();
-//		UserDto dto = UserDto.getNewUserDto(String.valueOf(user.getId()), user.getId(), "poem");
-//		return ResultUtil.buildResultSucc(dto);
+		Tuple<User, byte[]> tuple = userService.login(username, password);
+		if(tuple.left == null) {
+			return new ByteResult(tuple.right);
+		}
+		User user = tuple.left;
+		UserDto dto = UserDto.getNewUserDto(String.valueOf(user.getId()), user.getId(), "poem");
+		Session session = request.getNewSession();
+		request.setSessionId(session.getId());
+		request.getSession().setAttribute(Constants.USER, dto);
+		
+		JsonDocument doc = new JsonDocument();
+		doc.startObject();
+		doc.createElement("sessionId", session.getId());
+		doc.endObject();
+		return new ByteResult(JsonBuilder.getJson(ResultState.SUCCESS, doc.toByte()));
 	}
 
 	@Command(value="userRead")
-	public Result read(@RequestParam("id") int id) {
-		User user = userService.getUserById(id);
-		return ResultUtil.buildResultSucc(user);
+	public ByteResult read(@RequestParam("id") int id) {
+		return new ByteResult(userService.getUserById(id));
 	}
 
 }

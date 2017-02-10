@@ -28,7 +28,7 @@ public class TcpServerHandler extends SimpleChannelInboundHandler<RequestMessage
     	System.out.println("tcp read!");
     	if (msg instanceof RequestMessage) {
     		RequestMessage message = (RequestMessage) msg;
-    		message.setSessionId(ctx.channel().attr(ServerConstants.SESSIONID).get());
+//    		message.setSessionId(ctx.channel().attr(ServerConstants.SESSIONID).get());
     		
     		Request request = new TcpRequest(ctx, message);
     		Response response = new TcpResponse(ctx.channel());
@@ -114,13 +114,13 @@ public class TcpServerHandler extends SimpleChannelInboundHandler<RequestMessage
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
     	System.out.println("chanel actived "+ctx.name());
-    	String sessionId = ctx.channel().attr(ServerConstants.SESSIONID).get();
-    	if (sessionId == null) {
-    		Session session = SessionManager.getInstance().getSession(null, true);
-    		session.setPush(new TcpPush(ctx.channel()));
-    		ctx.channel().attr(ServerConstants.SESSIONID).set(session.getId());
-    		System.err.println("session create "+session.id);
-    	}
+//    	String sessionId = ctx.channel().attr(ServerConstants.SESSIONID).get();
+//    	if (sessionId == null) {
+//    		Session session = SessionManager.getInstance().getSession(null, true);
+//    		session.setPush(new TcpPush(ctx.channel()));
+//    		ctx.channel().attr(ServerConstants.SESSIONID).set(session.getId());
+//    		System.err.println("session create "+session.id);
+//    	}
     }
   
     @Override  

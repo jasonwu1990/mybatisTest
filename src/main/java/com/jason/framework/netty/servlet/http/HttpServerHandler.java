@@ -10,8 +10,8 @@ import com.jason.framework.netty.servlet.Request;
 import com.jason.framework.netty.servlet.Response;
 import com.jason.framework.netty.servlet.ws.WebSocketServerHandler;
 import com.jason.util.HttpUtil;
-import com.jason.util.Tuple;
 import com.jason.util.WebUtils;
+import com.jason.util.stl.Tuple;
 
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;

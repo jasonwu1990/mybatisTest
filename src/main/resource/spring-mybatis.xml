@@ -46,7 +46,7 @@
     <!-- DAO接口所在包名，Spring会自动查找其下的类 -->  
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">  
         <property name="basePackage" value="com.jason.user.dao" />  
-        <property name="annotationClass" value="com.jason.dao.base.MyBatisRepository"/>
+        <property name="annotationClass" value="com.jason.mybatis.annotation.MyBatisRepository"/>
     </bean>  
   
     <!-- (事务管理)transaction manager, use JtaTransactionManager for global tx -->  
