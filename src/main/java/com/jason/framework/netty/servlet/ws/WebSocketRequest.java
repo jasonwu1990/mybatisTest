@@ -197,7 +197,6 @@ public class WebSocketRequest implements Request{
 
 	@Override
 	public String getIp() {
-		// TODO Auto-generated method stub
 		return getRemoteAddress().getAddress().getHostAddress();
 	}
 

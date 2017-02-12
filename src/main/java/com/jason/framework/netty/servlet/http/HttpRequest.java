@@ -55,6 +55,8 @@ public class HttpRequest implements Request {
 	private String url;
 	
 	private boolean longHttp = false;
+	
+	private io.netty.handler.codec.http.HttpRequest httpRequest;
 
 	public HttpRequest (ChannelHandlerContext ctx,
 			io.netty.handler.codec.http.HttpRequest httpRequest,
@@ -65,6 +67,7 @@ public class HttpRequest implements Request {
 			Map<String, String> headers,
 			Response response, String uri) {
 		this.ctx = ctx;
+		this.setHttpRequest(httpRequest);
 		this.channel = ctx.channel();
 		this.response = response;
 		this.cookies = cookies;
@@ -258,6 +261,14 @@ public class HttpRequest implements Request {
 	public String getIp() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public io.netty.handler.codec.http.HttpRequest getHttpRequest() {
+		return httpRequest;
+	}
+
+	public void setHttpRequest(io.netty.handler.codec.http.HttpRequest httpRequest) {
+		this.httpRequest = httpRequest;
 	}
 
 	@Override

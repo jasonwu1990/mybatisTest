@@ -2,7 +2,9 @@ package com.jason.framework.netty.invocate;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -10,16 +12,15 @@ import org.apache.log4j.Logger;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.util.StringUtils;
 
-import com.alibaba.fastjson.JSONObject;
-import com.jason.framework.common.Constants;
-import com.jason.framework.common.dto.UserDto;
 import com.jason.framework.netty.annotation.Action;
 import com.jason.framework.netty.annotation.Command;
+import com.jason.framework.netty.interceptor.Interceptor;
+import com.jason.framework.netty.interceptor.impl.AuthInterception;
+import com.jason.framework.netty.interceptor.impl.ExceptionInterception;
 import com.jason.framework.netty.servlet.Request;
 import com.jason.framework.netty.servlet.Response;
-import com.jason.framework.netty.servlet.Result;
 import com.jason.log4jDemo.Log4jTest;
-import com.jason.util.ResultUtil;
+import com.jason.mvc.view.ByteResult;
 import com.jason.util.ScanUtils;
 import com.jason.util.Utils;
 
@@ -37,6 +38,8 @@ public class InvocationFactory {
 	private AbstractApplicationContext ac;
 	
 	protected static Map<String, ActionInvocation> handlerMap = new HashMap<String, ActionInvocation>();
+	
+	protected List<Interceptor> interceptorList;
 	
 	public void init(AbstractApplicationContext ac, String packagePath) throws Exception {
 		this.ac = ac;
@@ -56,7 +59,11 @@ public class InvocationFactory {
 	}
 
 	private void initInterceptorList() {
-		
+		Interceptor intercete = new ExceptionInterception();
+		interceptorList = new ArrayList<Interceptor>();
+		interceptorList.add(intercete);
+		Interceptor intercete2 = new AuthInterception();
+		interceptorList.add(intercete2);
 	}
 	
 	private void initHandleAction(String scanPath) throws Exception {
@@ -124,9 +131,9 @@ public class InvocationFactory {
 			if (null == invocation) {
 				throw new RuntimeException("No such method，command is ："+request.getCommand());
 			}
-			byte[] result = invocation.invoke(request, response).getResult();
-			if (result != null) {
-				ActionInvocation.render(result, request, response);
+			Object result = invocation.invoke(interceptorList == null ? null : interceptorList.iterator(), request, response);
+			if (result instanceof ByteResult) {
+				ActionInvocation.render(((ByteResult)result).getResult(), request, response);
 			}
 		} catch (Throwable t) {
 			throw new RuntimeException(t);

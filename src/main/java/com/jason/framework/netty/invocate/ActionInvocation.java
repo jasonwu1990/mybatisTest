@@ -2,16 +2,14 @@ package com.jason.framework.netty.invocate;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Rule;
+import java.util.Iterator;
 
 import com.jason.framework.netty.adaptor.Adaptor;
 import com.jason.framework.netty.adaptor.RequestAdaptor;
 import com.jason.framework.netty.adaptor.RequestParamAdaptor;
 import com.jason.framework.netty.adaptor.ResponseAdaptor;
 import com.jason.framework.netty.annotation.RequestParam;
+import com.jason.framework.netty.interceptor.Interceptor;
 import com.jason.framework.netty.servlet.Request;
 import com.jason.framework.netty.servlet.Response;
 import com.jason.framework.session.ServerProtocol;
@@ -34,8 +32,6 @@ public class ActionInvocation {
 	
 	protected boolean needValidate;
 	
-	protected List<Rule> validateInterceptor;
-	
 	protected Object obj;
 	
 	private static final String CLASS_KEY = "class";
@@ -53,22 +49,26 @@ public class ActionInvocation {
 		initParam();
 	}
 	
-	public ByteResult invoke(Request request, Response response) throws Exception {
+	public Object invoke(Iterator<Interceptor> iterator, Request request, Response response) throws Exception {
 		Session session = request.getSession(false);
 		if (syn && session != null) {
 			synchronized(session) {
-				return _invoke(request, response);
+				return _invoke(iterator, request, response);
 			}
 		}else {
-			return _invoke(request, response);
+			return _invoke(iterator, request, response);
 		}
 	}
 
-	protected ByteResult _invoke(Request request, Response response) throws Exception {
-		
+	protected Object _invoke(Iterator<Interceptor> interceptor, Request request, Response response) throws Exception {
 		Object[] params = adapt(request, response);
-		ByteResult result = (ByteResult) method.invoke(obj, params);
-		return result;
+		// 拦截器添加
+		if(interceptor == null || !interceptor.hasNext()) {
+			ByteResult result = (ByteResult) method.invoke(obj, params);
+			return result;
+		}
+		Object object = interceptor.next().interceptor(interceptor, this, request, response);
+		return object;
 	}
 
 	protected void initParam() {
@@ -127,17 +127,14 @@ public class ActionInvocation {
 		}
 	}
 	
-	public void addInterceptor(Rule rule) {
-		if (validateInterceptor == null) {
-			validateInterceptor = new ArrayList<Rule>();
-		}
-		validateInterceptor.add(rule);
-	}
-	
 	public void setNeedSkipDefault(boolean needSkip) {
 		this.needValidate = needSkip;
 	}
-	
+
+	public String getMethodName() {
+		return methodName;
+	}
+
 //	// 针对对象数组，是DTO[]的过滤class字段
 //    private void removeKey(Object[] array, String key, SameObjectChecker objs) {
 //        if (array != null && objs.checkThenPush(array)) {
