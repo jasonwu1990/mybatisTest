@@ -1,5 +1,8 @@
 package com.jason.user.action;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -26,6 +29,8 @@ public class UserAction {
 	@Autowired
 	private IUserService userService;
 	
+	private Map<Integer, UserDto> userDtoMap = new ConcurrentHashMap<Integer, UserDto>();
+	
 
 	@Command(value="userRegist")
 	public ByteResult regist(@RequestParam("username") String username, 
@@ -50,7 +55,10 @@ public class UserAction {
 			return new ByteResult(tuple.right);
 		}
 		User user = tuple.left;
-		UserDto dto = UserDto.getNewUserDto(String.valueOf(user.getId()), user.getId(), "poem");
+		UserDto dto = UserDto.getNewUserDto(String.valueOf(user.getId()), user.getId(), "cat");
+		if(userDtoMap.get(user.getId()) != null) {
+			userDtoMap.put(user.getId(), dto);
+		}
 		Session session = request.getNewSession();
 		request.setSessionId(session.getId());
 		request.getSession().setAttribute(Constants.USER, dto);
@@ -60,11 +68,6 @@ public class UserAction {
 		doc.createElement("sessionId", session.getId());
 		doc.endObject();
 		return new ByteResult(JsonBuilder.getJson(ResultState.SUCCESS, doc.toByte()));
-	}
-
-	@Command(value="userRead")
-	public ByteResult read(@RequestParam("id") int id) {
-		return new ByteResult(userService.getUserById(id));
 	}
 
 }
